@@ -1,0 +1,25 @@
+[
+  {
+    "model_name": "Imagen 4",
+    "version": "imagen-4.0-generate-preview-06-06",
+    "status": "New"
+  },
+  {
+    "model_name": "Imagen 4 Ultra",
+    "version": "imagen-4.0-ultra-generate-preview-06-06",
+    "status": "New"
+  },
+  {
+    "model_name": "Imagen 4 Fast",
+    "version": "imagen-4.0-fast-generate-preview-06-06",
+    "status": "New"
+  },
+  {
+    "model_name": "Imagen 3",
+    "version": "imagen-3.0-generate-002"
+  },
+  {
+    "model_name": "Imagen 3 Fast",
+    "version": "imagen-3.0-fast-generate-001"
+  }
+]

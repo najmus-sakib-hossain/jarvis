@@ -1,0 +1,271 @@
+.orb-main {
+  display: flex;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  height: var(--react-ai-orb-size);
+  width: var(--react-ai-orb-size);
+  border-radius: 50%;
+  background-image: radial-gradient(
+    circle at 50% 30%,
+    var(--main-bg-start) 0%,
+    var(--main-bg-end) 70%
+  );
+
+  box-shadow: var(--main-shadow);
+  animation: var(--main-hue-animation);
+}
+
+/* Shape Locations */
+
+.loc-a {
+  position: absolute;
+}
+
+.loc-b {
+  position: absolute;
+  left: 10%;
+  top: 5%;
+}
+
+.loc-c {
+  position: absolute;
+  left: 5%;
+  top: 5%;
+}
+
+.loc-d {
+  position: absolute;
+  left: 5%;
+  top: 5%;
+}
+
+.loc-glass {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* shape styles */
+
+.shape-a {
+  border-radius: 50%;
+  height: var(--shapes-size);
+  width: var(--shapes-size);
+  background-image: radial-gradient(
+    circle at 50% 90%,
+    var(--shape-a-start) 0%,
+    var(--shape-a-end) 70%
+  );
+  transform-style: preserve-3d;
+  /* Animation */
+  animation: rotateDiagonal var(--animation-rotation-speed-base) linear infinite,
+    hueShift var(--animation-hue-speed-base) linear infinite;
+}
+
+.shape-b {
+  border-radius: 50%;
+  height: var(--shapes-size);
+  width: var(--shapes-size);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 33% 12%,
+    var(--shape-b-start) 0%,
+    var(--shape-b-middle) 26%,
+    var(--shape-b-end) 63%
+  );
+  filter: blur(2px);
+  will-change: transform;
+  transform-style: preserve-3d;
+  /* Animation */
+  animation: rotateDiagonal
+      calc(
+        var(--animation-rotation-speed-base) +
+          var(--animation-rotation-speed-base) * 0.5
+      )
+      linear infinite,
+    hueShift
+      calc(
+        var(--animation-hue-speed-base) + var(--animation-hue-speed-base) * 0.5
+      )
+      linear infinite;
+  mix-blend-mode: soft-light;
+}
+
+.shape-c {
+  height: var(--shapes-size);
+  width: var(--shapes-size);
+  border-radius: 50%;
+  background-image: radial-gradient(
+    circle at 31% 12%,
+    var(--shape-c-start) 0%,
+    var(--shape-c-middle) 31%,
+    var(--shape-c-end) 77%
+  );
+  filter: blur(1px);
+  opacity: 0.65;
+  transform-style: preserve-3d;
+  /* Animation */
+  animation: rotateDiagonal
+      calc(
+        var(--animation-rotation-speed-base) +
+          var(--animation-rotation-speed-base) * 1
+      )
+      linear infinite,
+    hueShift
+      calc(
+        var(--animation-hue-speed-base) + var(--animation-hue-speed-base) * 1
+      )
+      linear infinite;
+  mix-blend-mode: color-dodge;
+}
+
+.shape-d {
+  height: var(--shapes-size);
+  width: var(--shapes-size);
+  border-radius: 50%;
+  background-image: radial-gradient(
+    circle at 12% 80%,
+    var(--shape-d-start) 0%,
+    var(--shape-d-middle) 31%,
+    var(--shape-d-end) 77%
+  );
+  filter: blur(1px);
+  opacity: 0.55;
+  transform-style: preserve-3d;
+  /* Animation */
+  animation: rotateDiagonal
+      calc(
+        var(--animation-rotation-speed-base) +
+          var(--animation-rotation-speed-base) * 1.5
+      )
+      linear infinite,
+    hueShift
+      calc(
+        var(--animation-hue-speed-base) + var(--animation-hue-speed-base) * 1.5
+      )
+      linear infinite;
+  mix-blend-mode: color;
+}
+
+.glass {
+  height: var(--shapes-size);
+  width: var(--shapes-size);
+  opacity: 0.8;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: inset 0 -1px 6px 1px rgba(255, 255, 255, 0.5),
+    inset 0 3px 4px 0px rgba(255, 255, 255, 0.5);
+}
+
+.blob-a {
+  animation: rotateDiagonal
+      calc(
+        var(--animation-rotation-speed-base) +
+          var(--animation-rotation-speed-base) * 2
+      )
+      linear infinite,
+    hueShift
+      calc(
+        var(--animation-hue-speed-base) + var(--animation-hue-speed-base) * 2
+      )
+      linear infinite;
+  opacity: var(--blob-a-opacity);
+  mix-blend-mode: screen;
+}
+
+.blob-b {
+  position: absolute;
+  top: 0;
+  opacity: var(--blob-b-opacity);
+  mix-blend-mode: lighten;
+  animation: rotateDiagonal
+      calc(
+        var(--animation-rotation-speed-base) +
+          var(--animation-rotation-speed-base) * 2.5
+      )
+      linear infinite,
+    hueShift
+      calc(
+        var(--animation-hue-speed-base) + var(--animation-hue-speed-base) * 2.5
+      )
+      linear infinite;
+}
+
+.blob-shine {
+  position: absolute;
+  top: 0;
+  opacity: 0.9;
+  fill: white;
+  transform: scale(0.4);
+  animation: expand 3.5s linear infinite;
+  mix-blend-mode: hard-light;
+  filter: blur(15px);
+}
+
+.shine-b {
+  mix-blend-mode: plus-lighter;
+  animation: expand-b 5s ease-in-out infinite;
+  opacity: 0.3;
+  left: 15%;
+}
+
+@keyframes expand {
+  0% {
+    transform: scale(0.4);
+  }
+  50% {
+    transform: scale(0.1);
+  }
+  100% {
+    transform: scale(0.4);
+  }
+}
+
+@keyframes expand-b {
+  0% {
+    transform: scale(0.6);
+  }
+  50% {
+    transform: scale(0.1);
+  }
+  100% {
+    transform: scale(0.6);
+  }
+}
+
+/* Keyframes for 3D rotation */
+@keyframes rotateDiagonal {
+  0% {
+    transform: rotate3d(1, 1, 1, 0deg);
+  }
+  100% {
+    transform: rotate3d(1, 1, 1, 360deg);
+  }
+}
+
+@keyframes hueShift {
+  0% {
+    filter: hue-rotate(0deg);
+  }
+  50% {
+    filter: hue-rotate(var(--hue-rotation));
+  }
+  100% {
+    filter: hue-rotate(0deg);
+  }
+}
+
+@keyframes circleAnimation {
+  0% {
+    transform: rotate(-120deg);
+  }
+  50% {
+    transform: rotate(0);
+  }
+
+  100% {
+    transform: rotate(-120deg);
+  }
+}

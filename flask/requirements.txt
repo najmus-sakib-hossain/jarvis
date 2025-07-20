@@ -1,0 +1,7 @@
+requests
+Flask
+Flask-Cors
+google-generativeai
+google-auth
+google-genai
+cloudinary

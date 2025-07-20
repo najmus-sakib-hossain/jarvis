@@ -1,0 +1,159 @@
+'use client';
+
+import { useState, useRef, useEffect, FormEvent } from 'react';
+import { useFridayChatStore, Message } from '@/store/friday-chat-store';
+import { ChatOptions } from '@/components/chat-options';
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { SendHorizonal, Bot, User, CornerDownLeft } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+
+const ChatMessage = ({ message }: { message: Message }) => {
+  const isModel = message.role === 'model';
+  return (
+    <div className={`flex items-start gap-3 ${isModel ? '' : 'justify-end'}`}>
+      {isModel && <div className="p-2 bg-primary rounded-full text-primary-foreground"><Bot size={16} /></div>}
+      <div className={`max-w-[80%] rounded-xl px-4 py-3 ${isModel ? 'bg-muted' : 'bg-primary text-primary-foreground'}`}>
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
+          components={{
+            p: ({ node, ...props }) => <p className="mb-2 last:mb-0" {...props} />,
+            code({ node, className, children, ...props }) {
+              const match = /language-(\w+)/.exec(className || '');
+              return match ? (
+                <div className="my-2 bg-gray-800 rounded-md">
+                  <div className="flex items-center justify-between px-4 py-1 bg-gray-700 rounded-t-md">
+                    <span className="text-xs text-gray-400">{match[1]}</span>
+                  </div>
+                  <pre className="p-4 text-sm overflow-x-auto"><code className={className} {...props}>{children}</code></pre>
+                </div>
+              ) : (
+                <code className="bg-gray-700 text-cyan-400 px-1 py-0.5 rounded-sm" {...props}>
+                  {children}
+                </code>
+              );
+            },
+          }}
+        >
+          {message.parts[0].text}
+        </ReactMarkdown>
+      </div>
+      {!isModel && <div className="p-2 bg-secondary rounded-full text-secondary-foreground"><User size={16} /></div>}
+    </div>
+  );
+};
+
+export default function FridayChatPage() {
+  const [input, setInput] = useState('');
+  const { messages, addMessage, updateLastMessage, isLoading, setLoading, mediaCategory, parentSubCategory, childSubCategory } = useFridayChatStore();
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (scrollAreaRef.current) {
+      scrollAreaRef.current.scrollTo({
+        top: scrollAreaRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+  }, [messages]);
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || isLoading) return;
+
+    const userMessage: Message = { role: 'user', parts: [{ text: input }] };
+    addMessage(userMessage);
+    setInput('');
+    setLoading(true);
+
+    try {
+      addMessage({ role: 'model', parts: [{ text: '' }] });
+
+      const response = await fetch('/api/friday-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          history: messages,
+          message: input,
+          mediaCategory,
+          parentSubCategory,
+          childSubCategory,
+        }),
+      });
+
+      if (!response.ok || !response.body) {
+        throw new Error(`API error: ${response.statusText}`);
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+        updateLastMessage(chunk);
+      }
+    } catch (error) {
+      console.error("Chat API request failed:", error);
+      updateLastMessage(`\n\n**Error:** Sorry, I couldn't get a response. Please try again.`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="flex justify-center items-center h-screen bg-background p-4">
+      <Card className="w-full max-w-4xl h-[90vh] flex flex-col">
+        <CardHeader>
+          <h1 className="text-2xl font-bold text-center">Friday AI</h1>
+          <p className="text-sm text-muted-foreground text-center">Your multi-modal AI assistant</p>
+        </CardHeader>
+        <CardContent className="flex-1 overflow-hidden">
+          <ScrollArea className="h-full pr-4" ref={scrollAreaRef}>
+            <div className="space-y-6">
+              {messages.map((msg, index) => (
+                <ChatMessage key={index} message={msg} />
+              ))}
+              {isLoading && messages[messages.length -1]?.role === 'model' && (
+                 <div className="flex items-start gap-3">
+                    <div className="p-2 bg-primary rounded-full text-primary-foreground"><Bot size={16} /></div>
+                    <div className="max-w-[80%] rounded-xl px-4 py-3 bg-muted">
+                        <div className="flex items-center space-x-2">
+                            <div className="w-2 h-2 bg-foreground rounded-full animate-pulse"></div>
+                            <div className="w-2 h-2 bg-foreground rounded-full animate-pulse [animation-delay:0.2s]"></div>
+                            <div className="w-2 h-2 bg-foreground rounded-full animate-pulse [animation-delay:0.4s]"></div>
+                        </div>
+                    </div>
+                 </div>
+              )}
+            </div>
+          </ScrollArea>
+        </CardContent>
+        <CardFooter>
+          <form onSubmit={handleSubmit} className="flex items-center w-full gap-2">
+            <ChatOptions />
+            <div className="relative flex-1">
+              <Input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Ask Friday anything..."
+                className="pr-12"
+                disabled={isLoading}
+              />
+              <div className="absolute inset-y-0 right-3 flex items-center text-xs text-muted-foreground">
+                <CornerDownLeft size={14} />
+              </div>
+            </div>
+            <Button type="submit" disabled={isLoading || !input.trim()}>
+              <SendHorizonal size={18} />
+            </Button>
+          </form>
+        </CardFooter>
+      </Card>
+    </div>
+  );
+}
